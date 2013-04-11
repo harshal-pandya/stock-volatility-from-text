@@ -67,7 +67,11 @@
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+        <groupId>edu.stanford.nlp</groupId>
+        <artifactId>stanford-corenlp</artifactId>
+        <version>1.2.0</version>
+    </dependency>
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
@@ -87,12 +91,65 @@
       <version>1.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.2</version>
+    </dependency>
   </dependencies>
 
   <build>
     <sourceDirectory>src/main/scala</sourceDirectory>
     <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
+        <plugin>
+            <groupId>net.alchim31.maven</groupId>
+            <artifactId>scala-maven-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>compile</goal>
+                        <goal>testCompile</goal>
+                    </goals>
+                    <configuration>
+                        <args>
+                            <arg>-make:transitive</arg>
+                            <arg>-dependencyfile</arg>
+                            <arg>${project.build.directory}/.scala_dependencies</arg>
+                        </args>
+                    </configuration>
+                </execution>
+            </executions>
+            <configuration>
+                <recompileMode>incremental</recompileMode>
+                <useZincServer>true</useZincServer>
+                <scalaVersion>${scala.version}</scalaVersion>
+
+                <jvmArgs>
+                    <jvmArg>-Xms64m</jvmArg>
+                    <jvmArg>-Xmx1800m</jvmArg>
+                </jvmArgs>
+
+                <args>
+                    <arg>-target:jvm-1.5</arg>
+                    <arg>-deprecation</arg>
+                </args>
+                <launchers>
+                    <launcher>
+                        <id>counter</id>
+                        <mainClass>edu.umass.cs.iesl.harshal.voltext.Runner</mainClass>
+                        <args>
+                            <arg>/iesl/canvas/sameer/dat/nyt/data</arg>
+                            <arg>/iesl/local/harshal/development/voltext/bp.txt</arg>
+                        </args>
+                        <jvmArgs>
+                            <jvmArg>-Xmx50g</jvmArg>
+                        </jvmArgs>
+                    </launcher>
+                </launchers>
+            </configuration>
+        </plugin>
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
