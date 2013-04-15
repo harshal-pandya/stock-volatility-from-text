@@ -62,7 +62,7 @@ object Runner extends App{
 object Runner2 extends App{
   val filenames = new File(args(0))
   val dictionaryDir = new File(args(1))
-  val dictionary = FilterFinancialDocs.buildDictionary(dictionaryDir)
+  val dictionary = FinancialDictionary.buildDictionary(dictionaryDir)
   val fileList = new ArrayBuffer[String]()
   for (filename<-Source.fromFile(filenames).getLines()){
     val f = new File(filename)
