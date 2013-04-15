@@ -4,6 +4,8 @@ import java.io.{BufferedReader, FileInputStream, InputStreamReader, File}
 import java.util.zip.GZIPInputStream
 import cc.factorie.app.nlp.segment.ClearSegmenter
 import edu.stanford.nlp.ie.crf.CRFClassifier
+import org.w3c.dom.css.Counter
+import collection.mutable
 
 /**
  * @author harshal
@@ -15,20 +17,35 @@ object MentionCounter {
   val NameExtractor = """<ORGANIZATION>(.+?)</ORGANIZATION>""".r
   def apply(file:File,words:Set[String],isXml:Boolean=false)={
     val fText = fileText(file)
-//    val taggedText = ner(stripXml(fText))
-//    val matches = find(taggedText)
-//    val tokens = for (org<-matches) yield {
-//      val NameExtractor(name) = org
-//      stripPunctuation(name)
-//    }
+    val taggedText = ner(stripXml(fText))
+    val matches = find(taggedText)
+    val tokens = for (org<-matches) yield {
+      val NameExtractor(name) = org
+      stripPunctuation(name)
+    }
+    counter(tokens,words)
+  }
+//    val tokens = tokenize(stripXml(fText))
+//    if (counter(tokens,words)>0) 1
+//    else 0
+//  }
+
+  def apply(file:File,dictionary:mutable.HashMap[String, Int],isXml:Boolean=false):Boolean={
+    val fText = fileText(file)
     val tokens = tokenize(stripXml(fText))
-    if (counter(tokens,words)>0) 1
-    else 0
+    var flag = false
+    for (token <- tokens){
+      if (dictionary.contains(token.toLowerCase)){
+        dictionary(token.toLowerCase)+=1
+        flag = true
+      }
+    }
+    flag
   }
 
   def find(text:String) = """<ORGANIZATION>.+?</ORGANIZATION>""".r.findAllIn(text).toList
 
-  def counter(tokens:Seq[String],words:Set[String]) = tokens.foldLeft(0)((acc,t)=> if (words(t.toLowerCase.trim)) acc+1 else acc+0 )
+  def counter(tokens:Seq[String],words:Set[String]):Int = tokens.foldLeft(0)((acc,t)=> if (words(t.toLowerCase.trim)) acc+1 else acc+0 )
 
   def tokenize(text:String) = ClearSegmenter.tokenizer.getTokenList(text).map(_.text)
 
