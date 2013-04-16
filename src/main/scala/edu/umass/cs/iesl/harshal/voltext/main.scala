@@ -62,7 +62,9 @@ object Runner extends App{
 object Runner2 extends App{
   val filenames = new File(args(0))
   val dictionaryDir = new File(args(1))
-  val dictionary = FinancialDictionary.buildDictionary(dictionaryDir)
+  val rarity = args(3).toInt
+//  val dictionary = FinancialDictionary.buildDictionary(dictionaryDir)
+  val dictionary = FinancialDictionary.buildRareWordDictionary(dictionaryDir,rarity)
   val fileList = new ArrayBuffer[String]()
   for (filename<-Source.fromFile(filenames).getLines()){
     val f = new File(filename)
@@ -70,9 +72,10 @@ object Runner2 extends App{
     if (res){
       fileList+=filename
     }
+    println(filename)
   }
   writeToFile(fileList,args(2))
-  writeToFile(dictionary.toSeq.sortBy(_._2),args(3))
+  //writeToFile(dictionary.toSeq.sortBy(_._2),args(3))
 
   def writeToFile[A](s:Seq[A],outF:String){
     val writer = new OutputStreamWriter(new FileOutputStream(outF),"UTF-8")
@@ -84,5 +87,17 @@ object Runner2 extends App{
         writer.close()
       }
     }
+  }
+}
+
+object Ngramer extends App{
+  val filenames = new File(args(0))
+  for (filename <- Source.fromFile(filenames).getLines()){
+    val f = new File(filename)
+    val tf = NGrams.unigram(f,true)
+    val temp = f.getAbsolutePath.split("/")
+    val outFile = new File(args(1)+temp.takeRight(4).take(3).mkString("/")+temp.last.split("""\.""")(0)+".tsv.gz")
+    outFile.getParentFile.mkdirs()
+    NGrams.writer(outFile,tf)
   }
 }

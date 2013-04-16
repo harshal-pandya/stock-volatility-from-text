@@ -15,7 +15,7 @@ object MentionCounter {
   val serializedClassifier = "/iesl/canvas/harshal/development/voltext/english.all.3class.distsim.crf.ser.gz"
   val classifier = CRFClassifier.getClassifierNoExceptions(serializedClassifier)
   val NameExtractor = """<ORGANIZATION>(.+?)</ORGANIZATION>""".r
-  def apply(file:File,words:Set[String],isXml:Boolean=false)={
+  def apply(file:File,words:Set[String],isXml:Boolean)={
     val fText = fileText(file)
     val taggedText = ner(stripXml(fText))
     val matches = find(taggedText)
@@ -30,7 +30,7 @@ object MentionCounter {
 //    else 0
 //  }
 
-  def apply(file:File,dictionary:mutable.HashMap[String, Int],isXml:Boolean=false):Boolean={
+  def apply(file:File,dictionary:mutable.HashMap[String, Int],isXml:Boolean):Boolean={
     val fText = fileText(file)
     val tokens = tokenize(stripXml(fText))
     var flag = false
