@@ -4,16 +4,22 @@ import java.io._
 import io.Source
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Locale}
+import collection.mutable
 
 /**
  * @author harshal
  * @date: 4/11/13
  */
 object DataLoader {
-  def ibmv(file:File,out:File){
+  case class StartDate(y:Int,m:Int,d:Int)
+  val IBM_START = StartDate(1987,0,1)
+  val GS_START = StartDate(1999,4,1)
+  val UN_START = IBM_START
+  val UL_START = StartDate(1988,0,1)//1988-01-05
+  def fillInHolidays(file:File,out:File){
     val cal = Calendar.getInstance()
     val trueCal = Calendar.getInstance()
-    trueCal.set(1987,0,1)
+    trueCal.set(UL_START.y,UL_START.m,UL_START.d)
     val reader = new BufferedReader(new FileReader(file))
     val writer = new PrintWriter(out)
     try{
@@ -98,26 +104,57 @@ object DataLoader {
   def dateCompare(cal1:Calendar,cal2:Calendar) = (cal1.get(Calendar.YEAR)==cal2.get(Calendar.YEAR)) &&
     (cal1.get(Calendar.MONTH)==cal2.get(Calendar.MONTH)) && (cal1.get(Calendar.DAY_OF_MONTH)==cal2.get(Calendar.DAY_OF_MONTH))
 
-  def processLogFile(r:File,o:File){
+  def processLogFile(r:File,filter:File,o:File){
+//    val trueCal = Calendar.getInstance()
+//    trueCal.set(1987,0,1)
+    val set = filterByFinancialFiles(filter)
     val writer = new PrintWriter(new FileWriter(o))
     var c = 0
+    var n = 0
     for (line <- Source.fromFile(r).getLines()){
       val split = line.split("\t")
       if(split.length!=2){
+        //val cal = toDate(line)
+//        while(!dateCompare(trueCal,cal)){
+//          trueCal.add(Calendar.DATE, 1)
+//          println(trueCal.getTime)
+//          writer.write(0+"\n")
+//        }
+//        trueCal.add(Calendar.DATE, 1)
+//        n+=1
+//        if (n>=1162 && n<=1168) println(line)
         writer.write(c+"\n")
         c=0
       }
       else{
-        if (split(1).toInt > 1) c+=1
+        if (set(split(0)) && split(1).toInt > 4) c+=1
+        //if(split(1).toInt > 1)
+        //c+=1
       }
     }
     writer.close
   }
 
+  def toDate(s:String)={
+    val fields = s.split("/").takeRight(3)
+    val c = Calendar.getInstance()
+    c.set(fields(0).toInt,fields(1).toInt-1,fields(2).toInt)
+    c
+  }
+
   def main(args:Array[String]){
     val file = new File(args(0))
     val outFile = new File(args(1))
-    ibmv(file,outFile)
-//    processLogFile(file,outFile)
+    val filterFile = new File(args(2))
+//    fillInHolidays(file,outFile)
+    processLogFile(file,filterFile,outFile)
+  }
+
+  def filterByFinancialFiles(file:File)={
+    val set = new mutable.HashSet[String]()
+    for (line<-Source.fromFile(file).getLines()){
+      set+=line
+    }
+    set
   }
 }
