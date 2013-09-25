@@ -108,7 +108,7 @@ object DataLoader {
 //    val trueCal = Calendar.getInstance()
 //    trueCal.set(1987,0,1)
     val set = filterByFinancialFiles(filter)
-    val writer = new PrintWriter(new FileWriter(o))
+//    val writer = new PrintWriter(new FileWriter(o))
     var c = 0
     var n = 0
     for (line <- Source.fromFile(r).getLines()){
@@ -121,10 +121,10 @@ object DataLoader {
 //          writer.write(0+"\n")
 //        }
 //        trueCal.add(Calendar.DATE, 1)
-//        n+=1
-//        if (n>=1162 && n<=1168) println(line)
-        writer.write(c+"\n")
-        c=0
+        n+=1
+        if (n==6548) println(line)
+//        writer.write(c+"\n")
+//        c=0
       }
       else{
         if (set(split(0)) && split(1).toInt > 4) c+=1
@@ -132,7 +132,7 @@ object DataLoader {
         //c+=1
       }
     }
-    writer.close
+//    writer.close
   }
 
   def toDate(s:String)={

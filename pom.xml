@@ -158,6 +158,16 @@
                 </args>
                 <launchers>
                     <launcher>
+                        <id>topicm</id>
+                        <mainClass>edu.umass.cs.iesl.harshal.voltext.TopicModelling</mainClass>
+                        <args>
+                            <arg>/iesl/canvas/sameer/dat/nyt/data</arg>
+                        </args>
+                        <jvmArgs>
+                            <jvmArg>-Xmx50g</jvmArg>
+                        </jvmArgs>
+                    </launcher>
+                    <launcher>
                         <id>counter</id>
                         <mainClass>edu.umass.cs.iesl.harshal.voltext.Runner</mainClass>
                         <args>

@@ -47,14 +47,15 @@ object TopicModelling extends App{
     val pipeList = new ArrayList[Pipe]()
     pipeList.add(new CharSequenceLowercase())
     pipeList.add(new CharSequence2TokenSequence(Pattern.compile("\\p{L}[\\p{L}\\p{P}]+\\p{L}")))
-    pipeList.add(new TokenSequenceRemoveStopwords(new File("stoplists/en.txt"), "UTF-8", false, false, false))
+    pipeList.add(new TokenSequenceRemoveStopwords(new File(args(1)), "UTF-8", false, false, false))
     pipeList.add(new TokenSequence2FeatureSequence())
 
     val instances = new InstanceList (new SerialPipes(pipeList))
     instances.addThruPipe(instanceIt)
 
     val numTopics = 100
-    val model = new ParallelTopicModel(numTopics, 1.0, 0.01)
+    val model = new ParallelTopicModel(numTopics, 50.0, 0.01)
+    model.addInstances(instances)
     // Use two parallel samplers, which each look at one half the corpus and combine
     //  statistics after every iteration.
     model.setNumThreads(2)
